@@ -127,9 +127,13 @@ export const aws4Interceptor = (
       body: transformedData,
     });
 
-    const result = await signer.sign(minimalRequest);
-
-    config.headers = result.headers;
+    if (options?.signQuery) {
+      const { query } = await signer.presign(minimalRequest);
+      config.params = query;
+    } else {
+      const result = await signer.sign(minimalRequest);
+      config.headers = result.headers;
+    }
 
     return config;
   };
